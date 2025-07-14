@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Payment Success – Realova Raffle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Outfit:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0 }
+    html, body { height: 100%; overflow: hidden }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #020014;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+      padding: 20px;
+      perspective: 800px;
+      color: #0ff;
+    }
+    .star {
+      position: absolute; top: -5px; width: 4px; height: 4px;
+      background: #0ff; box-shadow: 0 0 6px rgba(0,255,255,0.8);
+      border-radius: 50%; animation: fall linear infinite;
+      opacity: 0.8;
+    }
+    @keyframes fall { to { transform: translateY(110vh); opacity: 0 } }
+
+    .container {
+      position: relative;
+      background: rgba(20, 20, 40, 0.95);
+      backdrop-filter: blur(12px);
+      padding: 24px 40px;
+      width: 90%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+      border: 2px dashed #0ff;
+      border-radius: 20px;
+      box-shadow:
+        inset 0 0 12px rgba(0,255,255,0.15),
+        0 0 12px #0ff,
+        0 0 28px rgba(0,255,255,0.25);
+      color: #0ff;
+      font-family: 'Outfit', sans-serif;
+      clip-path: polygon(
+        0% 0%, 100% 0%,
+        100% 40%, 98% 45%, 100% 50%, 100% 100%,
+        0% 100%,
+        0% 50%, 2% 45%, 0% 40%,
+        0% 0%
+      );
+    }
+
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.7rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px rgba(0,255,255,0.8);
+    }
+
+    .ticket-details {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      width: 100%;
+      margin-bottom: 20px;
+      font-size: 0.95rem;
+      gap: 10px;
+    }
+
+    .ticket-details .section {
+      flex: 1 1 45%;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 10px 14px;
+      border-radius: 12px;
+      border-left: 4px solid #0ff;
+      text-align: left;
+      box-shadow: inset 0 0 6px rgba(0,255,255,0.15);
+    }
+
+    .serial {
+      font-family: monospace;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-align: right;
+      opacity: 0.8;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    .barcode {
+      width: 160px;
+      height: 40px;
+      background-image: repeating-linear-gradient(
+        to right,
+        #0ff 0px,
+        #0ff 2px,
+        transparent 2px,
+        transparent 5px
+      );
+      margin: 12px auto 0;
+      opacity: 0.5;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .button-row button {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      font-family: 'Orbitron', sans-serif;
+      background: transparent;
+      color: #0ff;
+      border: 2px solid #0ff;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 8px #0ff, inset 1px 1px 3px rgba(0,255,255,0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .button-row button:hover:enabled {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 0 12px #0ff, inset 1px 1px 4px rgba(0,255,255,0.5);
+    }
+
+    .button-row button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #resultMessage {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0ff;
+      min-height: 2em;
+      line-height: 1.4;
+    }
+
+    #prizeDisplay {
+      margin-top: 6px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #a2ffb0;
+      min-height: 1.5em;
+    }
+
+    #countdown {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ff5e5e;
+      text-shadow: 0 0 6px rgba(255, 30, 30, 0.8), 0 0 10px rgba(255, 0, 0, 0.5);
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<script>
+// ⛑️ Fallback user if no data in sessionStorage
+if (!sessionStorage.getItem('raffleUser')) {
+  const demoUser = {
+    name: "John Doe",
+    email: "john@example.com",
+    stake: 100,
+    numbers: [5, 12, 19, 28, 33, 42],
+    entryId: "DEMO123456"
+  };
+  sessionStorage.setItem('raffleUser', JSON.stringify(demoUser));
+}
+
+// Animated stars
+for (let i = 0; i < 60; i++) {
+  const s = document.createElement('div');
+  s.className = 'star';
+  s.style.left = `${Math.random() * 100}vw`;
+  s.style.animationDuration = `${4 + Math.random() * 4}s`;
+  s.style.animationDelay = `${Math.random() * 4}s`;
+  document.body.appendChild(s);
+}
+</script>
+
+<div class="container">
+  <h2>🎟️ Realova Raffle – Ticket</h2>
+  <div class="ticket-details">
+    <div class="section" id="userEntryLeft"></div>
+    <div class="section" id="userEntryRight"></div>
+  </div>
+  <div id="countdown"></div>
+  <div class="button-row">
+    <button id="checkResultBtn">Check My Result</button>
+    <button id="test3Btn">Test 3 Matches</button>
+    <button id="test4Btn">Test 4 Matches</button>
+    <button id="test5Btn">Test 5 Matches</button>
+    <button id="test6Btn">Test 6 Matches</button>
+    <button disabled id="claimBtn">Claim Prize</button>
+    <button disabled id="playAgainBtn">Play Again</button>
+  </div>
+  <div id="resultMessage"></div>
+  <div id="prizeDisplay"></div>
+  <div class="barcode"></div>
+  <div class="serial">Ticket No. #<span id="serialNo">000000</span></div>
+</div>
+
+<script>
+const user = JSON.parse(sessionStorage.getItem('raffleUser'));
+document.getElementById('userEntryLeft').innerHTML = `
+  <strong>Name:</strong> ${user.name}<br/>
+  <strong>Stake:</strong> €${user.stake}<br/>
+  <strong>Email:</strong> ${user.email}
+`;
+document.getElementById('userEntryRight').innerHTML = `
+  <strong>Your Numbers:</strong><br/>${user.numbers.join(', ')}<br/>
+  <strong>Draw ID:</strong> ${user.entryId}
+`;
+document.getElementById('serialNo').textContent = user.entryId.slice(-6);
+
+const checkResultBtn = document.getElementById('checkResultBtn');
+const claimPrizeBtn = document.getElementById('claimBtn');
+const playAgainBtn = document.getElementById('playAgainBtn');
+const resultBox = document.getElementById('resultMessage');
+const prizeBox = document.getElementById('prizeDisplay');
+
+let canCheckResult = false;
+let countdownTimer;
+
+function startCountdown(seconds = 120) {
+  const countdownEl = document.getElementById('countdown');
+  const end = Date.now() + seconds * 1000;
+
+  function tick() {
+    const now = Date.now();
+    const diff = end - now;
+
+    if (diff <= 0) {
+      countdownEl.textContent = '✅ Draw is ready! You may check your result.';
+      canCheckResult = true;
+      return;
+    }
+
+    canCheckResult = false;
+    const remaining = Math.floor(diff / 1000);
+    const h = Math.floor(remaining / 3600);
+    const m = Math.floor((remaining % 3600) / 60);
+    const s = remaining % 60;
+
+    countdownEl.textContent = `⏳ Next draw in: ${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    countdownTimer = requestAnimationFrame(tick);
+  }
+
+  tick();
+}
+
+startCountdown();
+
+checkResultBtn.addEventListener('click', async () => {
+  if (!canCheckResult) {
+    resultBox.textContent = ` Please wait! ${document.getElementById('countdown').textContent.replace("Next draw in:", "").trim()} remaining.`;
+    return;
+  }
+
+  checkResultBtn.disabled = true;
+  checkResultBtn.textContent = "🔍 Fetching Results...";
+  resultBox.textContent = "";
+  prizeBox.textContent = "";
+
+  try {
+    const res = await fetch(`/api/check-result?entryId=${encodeURIComponent(user.entryId)}`);
+    const data = await res.json();
+
+    if (data.status === 'ok') {
+      resultBox.innerHTML = `
+        
+        Winning Numbers: ${data.winningNumbers.join(', ')}<br/>
+        ✅ Matched Numbers: ${data.matchedNumbers.join(', ') || 'None'}
+      `;
+      prizeBox.textContent = data.prizeMessage;
+
+      const matched = data.matchedNumbers.length;
+      if (matched >= 3) {
+        claimPrizeBtn.disabled = false;
+        playAgainBtn.disabled = true;
+      } else {
+        claimPrizeBtn.disabled = true;
+        playAgainBtn.disabled = false;
+      }
+
+      cancelAnimationFrame(countdownTimer);
+      startCountdown();
+    } else {
+      resultBox.textContent = `⚠️ ${data.error || 'Could not check result.'}`;
+    }
+  } catch (err) {
+    resultBox.textContent = `🚨 Error: ${err.message}`;
+  }
+
+  checkResultBtn.disabled = true;
+  checkResultBtn.textContent = "✅ Result Checked";
+});
+
+claimPrizeBtn.addEventListener('click', () => {
+  window.location.href = 'withdrawal.html';
+});
+
+playAgainBtn.addEventListener('click', () => {
+  sessionStorage.removeItem('raffleUser');
+  window.location.href = 'index.html';
+});
+
+function simulateResult(matches) {
+  const winningNumbers = [1, 2, 3, 4, 5, 6];
+  const matchedNumbers = winningNumbers.slice(0, matches);
+  resultBox.innerHTML = `
+    
+     Winning Numbers: ${winningNumbers.join(', ')}<br/>
+    Matched Numbers: ${matchedNumbers.join(', ')}
+  `;
+  prizeBox.textContent = matches >= 3 ? `🎉 You won a prize for matching ${matches} numbers!` : "❌ No prize.";
+  checkResultBtn.disabled = true;
+
+  if (matches >= 3) {
+    claimPrizeBtn.disabled = false;
+    playAgainBtn.disabled = true;
+  } else {
+    claimPrizeBtn.disabled = true;
+    playAgainBtn.disabled = false;
+  }
+
+  cancelAnimationFrame(countdownTimer);
+  startCountdown();
+}
+
+document.getElementById('test3Btn').addEventListener('click', () => simulateResult(3));
+document.getElementById('test4Btn').addEventListener('click', () => simulateResult(4));
+document.getElementById('test5Btn').addEventListener('click', () => simulateResult(5));
+document.getElementById('test6Btn').addEventListener('click', () => simulateResult(6));
+</script>
+</body>
+</html>

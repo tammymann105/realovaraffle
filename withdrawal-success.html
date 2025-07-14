@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Withdrawal Requested – Realova Raffle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0 }
+    html, body { height:100%; overflow:hidden }
+    body {
+      font-family:'Outfit',sans-serif;
+      background: linear-gradient(160deg,#10001f,#23003a);
+      position:relative;
+      color:#fff;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .star {
+      position:absolute; top:-2px;
+      width:2px; height:2px;
+      background:#fff; border-radius:50%;
+      box-shadow:0 0 4px rgba(255,255,255,0.8);
+      animation: fall linear infinite; opacity:0.8;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh); opacity:0; }
+    }
+    .container {
+      position:relative; z-index:1;
+      background: rgba(20,5,40,0.9);
+      backdrop-filter: blur(6px);
+      padding:40px 30px;
+      border-radius:20px;
+      box-shadow:
+        0 0 20px rgba(0,255,255,0.6),
+        inset 2px 2px 8px rgba(0,0,0,0.7),
+        inset -2px -2px 8px rgba(255,255,255,0.1),
+        6px 6px 25px rgba(0,0,0,0.9),
+        -6px -6px 25px rgba(255,255,255,0.1);
+      width:90%; max-width:400px;
+      text-align:center;
+      animation: pulseGlow 1.2s ease-in-out 1;
+    }
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 rgba(0,255,255,0.2); }
+      50% { box-shadow: 0 0 24px rgba(0,255,255,0.6); }
+      100% { box-shadow:
+        0 0 20px rgba(0,255,255,0.6),
+        inset 2px 2px 8px rgba(0,0,0,0.7),
+        inset -2px -2px 8px rgba(255,255,255,0.1),
+        6px 6px 25px rgba(0,0,0,0.9),
+        -6px -6px 25px rgba(255,255,255,0.1);
+      }
+    }
+    h1 {
+      text-align:center;
+      font-family:'Orbitron',sans-serif;
+      color:#00ffcc;
+      margin-bottom:20px;
+      text-shadow: 0 0 10px #00ffcc;
+    }
+    .detail {
+      margin-bottom:14px;
+      font-size:1.1rem;
+      line-height:1.5;
+      font-weight:700;
+      color: #a2ffe3;
+    }
+    .confirm {
+      margin:20px 0;
+      font-size:1rem;
+      font-weight:600;
+      color:#dcaaff;
+    }
+    button {
+      width:100%;
+      padding:14px;
+      font-size:1rem; font-weight:600;
+      font-family: 'Orbitron', sans-serif;
+      color:#0ff;
+      background: transparent;
+      border: 2px solid #0ff;
+      border-radius:14px;
+      box-shadow:
+        0 0 10px #0ff,
+        inset 1px 1px 3px rgba(0,255,255,0.3);
+      cursor:pointer;
+      transition: transform .2s, box-shadow .2s;
+    }
+    button:hover {
+      transform:translateY(-2px);
+      box-shadow:
+        0 0 12px #0ff,
+        inset 1px 1px 4px rgba(0,255,255,0.5);
+    }
+  </style>
+  <!-- inside <head> of index.html -->
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<link rel="icon" href="images/favicon-32.png" type="image/png">
+</head>
+<body>
+  <audio id="cashSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_b4c7e8b2a7.mp3"></audio>
+  <script>
+    for(let i=0;i<80;i++){
+      const s=document.createElement('div');
+      s.className='star';
+      s.style.left=Math.random()*100+'vw';
+      s.style.animationDuration=4+Math.random()*4+'s';
+      s.style.animationDelay=Math.random()*4+'s';
+      document.body.appendChild(s);
+    }
+  </script>
+  <div class="container">
+    <h1>Withdrawal Requested</h1>
+    <div id="details"></div>
+    <p class="confirm">
+      Funds will arrive in your account within 1–2 business days.
+    </p>
+    <button id="again">Play Again</button>
+  </div>
+  <script>
+    const prize = sessionStorage.getItem('prizeAmount') || '—';
+    const data  = JSON.parse(sessionStorage.getItem('claimData')||'{}');
+    const container = document.getElementById('details');
+    container.innerHTML = `
+      <div class="detail"><strong>Prize Amount:</strong> €${prize}</div>
+      <div class="detail"><strong>Full Name:</strong> ${data.fullname||'—'}</div>
+      <div class="detail"><strong>IBAN:</strong> ${data.iban||'—'}</div>
+      <div class="detail"><strong>Bank Name:</strong> ${data.bank||'—'}</div>
+      <div class="detail"><strong>Country:</strong> ${data.country||'—'}</div>
+      <div class="detail"><strong>SWIFT/BIC:</strong> ${data.swift||'—'}</div>
+    `;
+    document.getElementById('again').onclick = ()=>{
+      window.location.href = 'introduction.html';
+    };
+
+    // Play cash sound on page load
+    window.onload = () => {
+      const audio = document.getElementById('cashSound');
+      if (audio) audio.play().catch(() => {});
+    };
+  </script>
+</body>
+</html>

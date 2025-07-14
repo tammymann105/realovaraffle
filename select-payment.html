@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Select Payment Method – Realova Raffle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset & Base */
+    * { box-sizing: border-box; margin:0; padding:0 }
+    html, body { height:100%; overflow:hidden }
+    body {
+      background: #020014;
+      font-family: 'Outfit', sans-serif;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Falling stars with neon-cyan glow */
+    .star {
+      position: absolute; top: -4px;
+      width: 3px; height: 3px;
+      background: #0ff;
+      border-radius: 50%;
+      opacity: 0.8;
+      animation: fall linear infinite;
+      box-shadow:
+        0 0 6px #0ff,
+        0 0 12px rgba(0,255,255,0.7);
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh); opacity: 0; }
+    }
+
+    /* Glassy 3D box with neon-cyan glow */
+    .box {
+      position: relative; z-index:1;
+      width: 320px; max-width:90vw; min-width:280px;
+      background: rgba(28, 0, 51, 0.65);
+      backdrop-filter: blur(8px);
+      border-radius: 20px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow:
+        inset 2px 2px 8px rgba(0,0,0,0.7),
+        inset -2px -2px 8px rgba(255,255,255,0.1),
+        0 0 16px #0ff,
+        0 0 32px rgba(0,255,255,0.5);
+    }
+
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      color: #0ff;
+      margin-bottom: 30px;
+      text-shadow: 0 0 6px #0ff;
+    }
+
+    /* Holo (hollow) buttons now bright by default */
+    .box button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 14px 20px;
+      margin-top: 20px;
+      background: rgba(0,255,255,0.1);  /* bright default */
+      border: 2px solid #0ff;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #0ff;
+      cursor: pointer;
+      gap: 10px;
+      transition: all 0.2s ease;
+      box-shadow:
+        0 0 12px #0ff,
+        inset 1px 1px 6px rgba(0,255,255,0.5);
+    }
+    .box button:hover {
+      /* maintain same bright look, optional scale */
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .logo { height:24px; width:auto; }
+    .card-logos {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      justify-content:center;
+    }
+
+    @media(max-width:400px) {
+      h2 { font-size:1.5rem; margin-bottom:24px; }
+      .box { padding:30px 20px; }
+      .logo { height:20px; }
+      .box button { font-size:16px; padding:12px 16px; gap:8px; }
+      .card-logos { gap:6px; }
+    }
+  </style>
+  <!-- inside <head> of index.html -->
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<link rel="icon" href="images/favicon-32.png" type="image/png">
+</head>
+<body>
+  <!-- Generate neon-cyan falling stars -->
+  <script>
+    for (let i = 0; i < 60; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + 'vw';
+      star.style.animationDuration = (4 + Math.random()*4) + 's';
+      star.style.animationDelay = Math.random()*4 + 's';
+      document.body.appendChild(star);
+    }
+  </script>
+
+  <div class="box">
+    <h2>Select Payment Method</h2>
+    <!-- Debit/Credit Button -->
+    <button onclick="pay('stripe')">
+      <span class="card-logos" aria-label="Visa and Mastercard logos">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="logo"/>
+        <svg viewBox="0 0 64 40" xmlns="http://www.w3.org/2000/svg" width="60" height="24" aria-hidden="true">
+          <circle cx="22" cy="20" r="18" fill="#ff0017"/>
+          <circle cx="42" cy="20" r="18" fill="#ffb400" style="mix-blend-mode:multiply"/>
+        </svg>
+      </span>
+    </button>
+    <!-- PayPal Button -->
+    <button onclick="pay('paypal')">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="logo"/>
+    </button>
+  </div>
+
+ <script>
+  const data = JSON.parse(sessionStorage.getItem('raffleUser'));
+  console.log("📦 raffleUser from sessionStorage:", data);
+
+  async function pay(method) {
+    if (!data) {
+      alert("Missing user data. Please go back and complete the form.");
+      return;
+    }
+
+    const endpoint = method === 'stripe' 
+      ? '/create-stripe-session' 
+      : '/create-paypal-order';
+
+    console.log(`➡️ Sending request to ${endpoint} with:`, data);
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        const err = await response.text();
+        console.error("❌ Server returned error:", err);
+        alert("Payment failed: " + err);
+        return;
+      }
+
+      const result = await response.json();
+      console.log("✅ Server response:", result);
+
+      if (result.url) {
+        console.log("🌐 Redirecting to:", result.url);
+        window.location.href = result.url;
+      } else {
+        alert("Payment error: " + (result.error || 'Unknown error'));
+      }
+    } catch (err) {
+      console.error("🔥 Network or fetch error:", err);
+      alert("Could not reach the payment server: " + err.message);
+    }
+  }
+</script>
+
+</body>
+</html>

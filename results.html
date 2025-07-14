@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recent Draws & Winners - Realova Raffle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(160deg, #0a001a, #1f0033);
+      color: #eee;
+      margin: 0;
+      padding: 30px 15px;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00ffcc;
+      margin-bottom: 30px;
+      font-weight: 600;
+      font-size: 2.5rem;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    .draw {
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 6px solid #bb77ff;
+      box-shadow: inset 0 0 10px #bb77ff44;
+      border-radius: 14px;
+      margin-bottom: 30px;
+      padding: 20px 25px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .draw-header {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #bb77ff;
+    }
+
+    .winning-numbers {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #00ffcc;
+      margin-bottom: 15px;
+    }
+
+    ul.winners-list {
+      list-style: none;
+      padding-left: 0;
+      max-height: 180px;
+      overflow-y: auto;
+      border-top: 1px solid #444;
+      margin-top: 10px;
+    }
+
+    ul.winners-list li {
+      padding: 8px 5px;
+      border-bottom: 1px solid #333;
+      font-size: 1rem;
+      display: flex;
+      justify-content: space-between;
+      color: #ddd;
+    }
+
+    ul.winners-list li:last-child {
+      border-bottom: none;
+    }
+
+    .winner-name {
+      font-weight: 600;
+      color: #fff;
+      max-width: 40%;
+      overflow-wrap: break-word;
+    }
+
+    .winner-details {
+      max-width: 55%;
+      text-align: right;
+      font-style: italic;
+      color: #bbb;
+    }
+
+    button {
+      display: block;
+      margin: 40px auto 0;
+      background: #a34fd4;
+      border: none;
+      color: white;
+      padding: 14px 36px;
+      font-size: 1.1rem;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 5px 15px #a34fd4aa;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #c265ff;
+      box-shadow: 0 7px 20px #c265ffcc;
+    }
+
+    @media (max-width: 600px) {
+      .draw-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+
+      ul.winners-list li {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+      }
+
+      .winner-details {
+        text-align: left;
+      }
+    }
+  </style>
+
+  <!-- inside <head> of index.html -->
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<link rel="icon" href="images/favicon-32.png" type="image/png">
+</head>
+<body>
+
+  <h1>Recent Draws & Winners</h1>
+
+  <div id="drawsContainer">
+    <!-- Draw results will be loaded here -->
+  </div>
+
+  <button onclick="window.location.href='index.html'">Back to Home</button>
+
+  <script>
+    async function loadDraws() {
+      try {
+        const response = await fetch('/api/draws');
+        if (!response.ok) throw new Error('Failed to load draws');
+        const draws = await response.json();
+
+        if (draws.length === 0) {
+          document.getElementById('drawsContainer').innerHTML = '<p>No draws yet.</p>';
+          return;
+        }
+
+        const html = draws.map(draw => {
+          return `
+            <div class="draw" aria-label="Raffle draw on ${new Date(draw.timestamp).toLocaleString()}">
+              <div class="draw-header">
+                <div><strong>Draw Date:</strong> ${new Date(draw.timestamp).toLocaleString()}</div>
+                <div><strong>Winning Numbers:</strong></div>
+              </div>
+              <div class="winning-numbers" aria-live="polite">${draw.winningNumbers.join(', ')}</div>
+
+              <div><strong>Winners (${draw.winners.length}):</strong></div>
+              <ul class="winners-list">
+                ${draw.winners.map(w => `
+                  <li>
+                    <span class="winner-name">${w.name}</span>
+                    <span class="winner-details">Won €${w.prize} (matched ${w.matchCount})</span>
+                  </li>
+                `).join('')}
+              </ul>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('drawsContainer').innerHTML = html;
+      } catch (err) {
+        document.getElementById('drawsContainer').innerHTML = `<p style="color:#f66;">Error loading draws: ${err.message}</p>`;
+      }
+    }
+
+    loadDraws();
+  </script>
+
+</body>
+</html>

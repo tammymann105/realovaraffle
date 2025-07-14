@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>How to Play – Realova Raffle</title>
+
+  <!-- FAVICONS -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon-32.png" type="image/png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;600&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0 }
+    html, body {
+      height: 100%;
+      overflow: hidden;     /* lock to viewport */
+    }
+    body {
+      font-family:'Outfit',sans-serif;
+      background:#020014;
+      color:#0ff;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;  /* center vertically */
+      text-align:center;
+      position:relative;
+      padding: 20px;
+    }
+
+    .logo-container {
+      margin-bottom: 12px;
+    }
+    .logo-container img {
+      width: 100px;
+      filter: drop-shadow(0 0 12px #0ff);
+      transition: transform .2s;
+    }
+    .logo-container img:hover {
+      transform: scale(1.05);
+    }
+
+    .star {
+      position:absolute; top:-5px;
+      width:3px; height:3px;
+      background:#0ff;
+      border-radius:50%;
+      opacity:0.7;
+      animation:fall 6s linear infinite;
+      box-shadow:0 0 6px #0ff,0 0 12px rgba(0,255,255,0.7);
+    }
+    @keyframes fall { to{transform:translateY(110vh);opacity:0;} }
+
+    .container {
+      width:360px; max-width:92%;
+      background:rgba(0,0,20,0.6);
+      border:2px solid #0ff;
+      border-radius:12px;
+      padding:20px;
+      text-align:left;
+      box-shadow:0 0 10px #0ff,inset 0 0 20px rgba(0,255,255,0.5);
+    }
+    h1 {
+      font-family:'Orbitron',sans-serif;
+      font-size:2rem;
+      text-shadow:0 0 8px #0ff;
+      margin-bottom:.75em;
+      background:linear-gradient(45deg,#fff,#0fc);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      text-align:center;
+    }
+    ul, ul ul { list-style:none; }
+    ul > li {
+      margin:.75em 0;
+      line-height:1.5;
+      color:#0ff;
+      font-weight:600;
+      position:relative;
+    }
+    ul ul {
+      margin-top:.5em;
+      padding-left:1.5em;
+    }
+    ul ul li {
+      padding-left:1.5em;
+      color:#0fc;
+      font-weight:600;
+      position:relative;
+    }
+    ul ul li::before {
+      content:"–";
+      position:absolute;
+      left:0;
+      color:#f6f;
+      font-weight:bold;
+    }
+
+    .cta { text-align:center; margin-top:1.5em; }
+    .cta button {
+      font-family:'Orbitron',sans-serif;
+      font-size:1rem;
+      font-weight:600;
+      padding:10px 24px;
+      background:transparent;
+      color:#0ff;
+      border:2px solid #0ff;
+      border-radius:8px;
+      text-shadow:0 0 6px #0ff;
+      box-shadow:0 0 10px #0ff,inset 0 0 10px rgba(52,216,216,0.3);
+      transition:all .2s;
+      cursor:pointer;
+    }
+    .cta button:hover {
+      background:rgba(0,255,255,0.1);
+      box-shadow:0 0 20px #0ff,inset 0 0 12px #0ff;
+      transform:translateY(-2px);
+    }
+
+    /* —— Responsive “shrink to fit” for small screens —— */
+    @media (max-height:600px), (max-width:360px) {
+      .container {
+        width:90%;
+        padding:12px;
+      }
+      h1 { font-size:1.5rem; }
+      ul > li { margin:.5em 0; font-size:.9rem; }
+      ul ul li { font-size:.85rem; }
+      .cta button { padding:8px 20px; font-size:.9rem; }
+      .logo-container img { width:80px; }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    for(let i=0;i<50;i++){
+      const s=document.createElement('div');
+      s.className='star';
+      s.style.left=Math.random()*100+'vw';
+      s.style.animationDuration=3+Math.random()*4+'s';
+      s.style.animationDelay=Math.random()*5+'s';
+      document.body.appendChild(s);
+    }
+  </script>
+
+
+  <div class="container">
+    <h1>How to Play</h1>
+    <ul>
+      <li>Enter your Name & Email, stake between €1–€500.</li>
+      <li>Pick exactly 6 unique numbers (1–100).</li>
+      <li>Pay via Debit/Credit or PayPal.</li>
+      <li>Wait 2 minutes — draws run every 2 minutes on a rolling schedule.</li>
+      <li>After the draw, if you match 3 or more numbers, you’re a winner:
+        <ul>
+          <li>3 matches → 4× your stake</li>
+          <li>4 matches → 6× your stake</li>
+          <li>5 matches → 8× your stake</li>
+          <li>6 matches → 10× your stake</li>
+        </ul>
+      </li>
+      <li>Winners can “Claim Prize” and fill in bank details for a SEPA transfer arriving in 1–2 business days.</li>
+    </ul>
+    <div class="cta">
+      <button onclick="window.location.href='index.html'">Let’s Play</button>
+    </div>
+  </div>
+</body>
+</html>

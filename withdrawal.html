@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Claim Prize – Realova Raffle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0 }
+    html, body { height:100%; overflow:hidden }
+    body {
+      font-family:'Outfit',sans-serif;
+      background:#020014;
+      display:flex; align-items:center; justify-content:center;
+      position:relative; padding: 20px;
+      color:#0ff;
+    }
+    .star {
+      position:absolute; top:-5px;
+      width:3px; height:3px;
+      background:#0ff;
+      border-radius:50%;
+      box-shadow:0 0 6px rgba(0,255,255,0.8);
+      animation: fall linear infinite;
+      opacity:0.8;
+    }
+    @keyframes fall {
+      to { transform: translateY(110vh); opacity:0; }
+    }
+    .container {
+      position:relative; z-index:1;
+      background: rgba(0, 10, 30, 0.7);
+      backdrop-filter: blur(10px);
+      padding:30px 24px;
+      border-radius:24px;
+      box-shadow:
+        inset 2px 2px 8px rgba(0,0,0,0.7),
+        inset -2px -2px 8px rgba(255,255,255,0.1),
+        6px 6px 30px rgba(0,255,255,0.1);
+      width:90%; max-width:420px;
+      text-align:left;
+    }
+    h1 {
+      text-align:center;
+      font-family:'Orbitron',sans-serif;
+      color:#0ff;
+      margin-bottom:16px;
+      text-shadow: 0 0 5px rgba(0,255,255,0.7), 0 0 15px rgba(0,255,255,0.5);
+    }
+    .form-group { margin-bottom:12px; }
+    label {
+      display:block;
+      margin-bottom:4px;
+      font-size:0.9rem;
+      font-family:'Outfit',sans-serif;
+      color:#c6c6f0;
+      text-shadow:none;
+    }
+    input {
+      width:100%;
+      padding:10px;
+      border:none;
+      border-radius:14px;
+      background: rgba(255,255,255,0.05);
+      box-shadow:
+        inset 2px 2px 6px rgba(0,255,255,0.15),
+        inset -2px -2px 6px rgba(0,255,255,0.1),
+        0 0 10px rgba(0,255,255,0.05);
+      color:#0ff;
+      font-size:1rem;
+      font-family:'Outfit',sans-serif;
+      transition: transform .2s, box-shadow .2s;
+    }
+    input:focus {
+      transform: scale(1.02);
+      box-shadow:
+        0 0 10px #0ff,
+        inset 1px 1px 3px rgba(0,255,255,0.5),
+        inset -1px -1px 3px rgba(0,255,255,0.2);
+      outline:none;
+    }
+    input[readonly] {
+      background: rgba(255,255,255,0.08);
+      cursor:default;
+    }
+    button {
+      width:100%;
+      padding:12px;
+      margin-top:12px;
+      font-size:1rem; font-weight:600;
+      color:#0ff;
+      font-family:'Orbitron',sans-serif;
+      background: transparent;
+      border: 2px solid #0ff;
+      border-radius:14px;
+      box-shadow:
+        0 0 12px rgba(0,255,255,0.5),
+        inset 0 0 8px rgba(0,255,255,0.2);
+      cursor:pointer;
+      transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    button:hover {
+      transform:translateY(-2px);
+      background: rgba(0,255,255,0.1);
+      box-shadow:
+        0 0 16px rgba(0,255,255,0.7),
+        inset 0 0 10px rgba(0,255,255,0.3);
+    }
+  </style>
+  <!-- inside <head> of index.html -->
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<link rel="icon" href="images/favicon-32.png" type="image/png">
+</head>
+<body>
+  <script>
+    for(let i=0;i<80;i++){
+      const s=document.createElement('div');
+      s.className='star';
+      s.style.left=Math.random()*100+'vw';
+      s.style.animationDuration=4+Math.random()*4+'s';
+      s.style.animationDelay=Math.random()*4+'s';
+      document.body.appendChild(s);
+    }
+  </script>
+  <div class="container">
+    <h1>Withdraw Your Cash</h1>
+    <div class="form-group">
+      <label>Prize Amount (€)</label>
+      <input id="amount" readonly>
+    </div>
+    <div class="form-group">
+      <label>Full Name<span style="color:#ff4d4f;">*</span></label>
+      <input id="fullname" required>
+    </div>
+    <div class="form-group">
+      <label>IBAN<span style="color:#ff4d4f;">*</span></label>
+      <input id="iban" required>
+    </div>
+    <div class="form-group">
+      <label>Bank Name<span style="color:#ff4d4f;">*</span></label>
+      <input id="bank" required>
+    </div>
+    <div class="form-group">
+      <label>Country of Residence<span style="color:#ff4d4f;">*</span></label>
+      <input id="country" required>
+    </div>
+    <div class="form-group">
+      <label>SWIFT / BIC Code<span style="color:#ff4d4f;">*</span></label>
+      <input id="swift" required>
+    </div>
+    <button id="withdrawBtn">Withdraw Now</button>
+  </div>
+  <script>
+    document.getElementById('amount').value = sessionStorage.getItem('prizeAmount') || '';
+    document.getElementById('withdrawBtn').onclick = () => {
+      const data = ['fullname','iban','bank','country','swift']
+        .reduce((o,id)=>{ o[id]=document.getElementById(id).value; return o; },{});
+      sessionStorage.setItem('claimData', JSON.stringify(data));
+      window.location.href = 'withdrawal-success.html';
+    };
+  </script>
+</body>
+</html>

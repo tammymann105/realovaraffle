@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Winners - Realova Raffle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: #020014;
+      color: #00ffcc;
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: top;
+      position: relative;
+      overflow: hidden;
+    }
+    h1 {
+      font-family: 'Orbitron', sans-serif;
+      color: #0ff;
+      text-shadow: 0 0 8px #0ff;
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+    }
+    /* Neon-glow box around scroll container */
+    #scrollWrapper {
+      position: relative;
+      width: 600px;
+      max-width: 90%;
+      height: 60vh;
+      margin-bottom: 30px;
+      overflow: hidden;
+      border: 2px solid #0ff;
+      border-radius: 12px;
+      box-shadow:
+        0 0 10px #0ff,
+        inset 0 0 20px rgba(0,255,255,0.5);
+      background: rgba(0, 0, 20, 0.6);
+    }
+    ul#winnersList {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      position: absolute;
+      left: 0;
+      width: 100%;
+      animation: scrollUp linear infinite;
+      animation-duration: var(--duration, 10s);
+    }
+    li {
+      background: rgba(0, 255, 255, 0.1);
+      border-left: 4px solid #0ff;
+      margin: 8px 16px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #fff;
+      text-shadow: 0 0 4px rgba(0,255,255,0.7);
+    }
+    .winner-info span {
+      display: block;
+    }
+    .winner-info .name {
+      font-weight: 600;
+      color: #0ff;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 16px;
+      font-family: 'Orbitron', sans-serif;
+      background: transparent;
+      color: #0ff;
+      border: 2px solid #0ff;
+      border-radius: 6px;
+      cursor: pointer;
+      text-shadow: 0 0 6px #0ff;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: rgba(0,255,255,0.1);
+      box-shadow: 0 0 8px #0ff, inset 0 0 8px #0ff;
+    }
+    .star {
+      position: absolute;
+      top: 0;
+      width: 3px;
+      height: 3px;
+      background: #0ff;
+      border-radius: 50%;
+      animation: fall linear infinite;
+      opacity: 0.6;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10vh); opacity: 1; }
+      100% { transform: translateY(110vh); opacity: 0; }
+    }
+    @keyframes scrollUp {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(calc(-1 * var(--list-height) * 1px)); }
+    }
+  </style>
+  <!-- inside <head> of index.html -->
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<link rel="icon" href="images/favicon-32.png" type="image/png">
+</head>
+<body>
+  <h1>Recent Winners</h1>
+  <div id="scrollWrapper">
+    <ul id="winnersList"></ul>
+  </div>
+  <button onclick="window.location.href='introduction.html'">Back</button>
+  <script>
+    const staticWinners = [
+      { name: 'Alice', amount: '€5,000', drawId: 'id-1751431234' },
+      { name: 'John', amount: '€4,350', drawId: 'id-1751435678' },
+      { name: 'Emily', amount: '€3,200', drawId: 'id-1751436723' },
+      { name: 'Michael', amount: '€4,150', drawId: 'id-1751439861' },
+      { name: 'Tope', amount: '€2,120', drawId: 'id-1751440191' },
+      { name: 'Emma', amount: '€1,500', drawId: 'id-1751445234' },
+      { name: 'Aoife', amount: '€1,350', drawId: 'id-1751446789' },
+      { name: 'Olivia', amount: '€900', drawId: 'id-1751452345' },
+      { name: 'Liam', amount: '€1,750', drawId: 'id-1751456789' },
+      { name: 'Noah', amount: '€2,620', drawId: 'id-1751460123' },
+      { name: 'Ava', amount: '€4,500', drawId: 'id-1751463456' },
+      { name: 'Sophia', amount: '€4,300', drawId: 'id-1751467890' },
+      { name: 'Mia', amount: '€1,150', drawId: 'id-1751470123' },
+      { name: 'Jackson', amount: '€2,050', drawId: 'id-1751472345' },
+      { name: 'Lucas', amount: '€3,900', drawId: 'id-1751476789' }
+    ];
+
+    async function loadWinners() {
+      const list = document.getElementById('winnersList');
+      let combined = [...staticWinners];
+      try {
+        const res = await fetch('/api/entries');
+        const data = await res.json();
+        const mapMultiplier = {3:4,4:6,5:8,6:10};
+        const dynamicWinners = data
+          .filter(e => e.matchCount >= 3)
+          .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp))
+          .map(entry => ({
+            name: entry.name,
+            amount: `€${entry.stake * (mapMultiplier[entry.matchCount] || 0)}`,
+            drawId: entry.entryId || 'N/A'
+          }));
+        combined = [...dynamicWinners, ...combined];
+      } catch (err) {
+        console.error('Failed to fetch live winners:', err);
+      }
+      combined.forEach(w => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <div class="winner-info">
+            <span class="name">🏆 ${w.name}</span>
+            <span>Won ${w.amount}</span>
+            <span>ID: ${w.drawId}</span>
+          </div>`;
+        list.appendChild(li);
+      });
+      // Duplicate content for seamless scroll
+      list.innerHTML += list.innerHTML;
+      const listHeight = list.scrollHeight / 2;
+      document.documentElement.style.setProperty('--list-height', listHeight);
+      const speed = 30;
+      const duration = listHeight / speed;
+      document.documentElement.style.setProperty('--duration', `${duration}s`);
+    }
+    window.addEventListener('load', loadWinners);
+    // Falling stars
+    for (let i = 0; i < 60; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      star.style.left = `${Math.random() * 100}vw`;
+      star.style.animationDuration = `${2 + Math.random() * 3}s`;
+      star.style.animationDelay = `${Math.random() * 5}s`;
+      document.body.appendChild(star);
+    }
+  </script>
+</body>
+</html>

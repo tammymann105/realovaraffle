@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment Failed - Realova Raffle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- inside <head> of index.html -->
+<link rel="icon" href="images/favicon.ico" type="image/x-icon">
+<link rel="icon" href="images/favicon-32.png" type="image/png">
+
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(160deg, #1a001a, #220033);
+      font-family: 'Outfit', sans-serif;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .message {
+      background: rgba(30, 10, 50, 0.85);
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #ff005c;
+      max-width: 400px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 32px;
+      color: #ff005c;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+    p {
+      font-size: 18px;
+      margin-bottom: 25px;
+      color: #f8a1b3;
+    }
+    button {
+      margin-top: 10px;
+      padding: 14px 28px;
+      background-color: #a34fd4;
+      border: none;
+      color: white;
+      font-size: 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 4px 15px #a34fd4aa;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      width: 100%;
+      max-width: 200px;
+    }
+    button:hover {
+      background-color: #c265ff;
+      box-shadow: 0 6px 20px #c265ffcc;
+    }
+    @media (max-width: 480px) {
+      .message {
+        padding: 30px 20px;
+      }
+      h1 {
+        font-size: 28px;
+      }
+      p {
+        font-size: 16px;
+      }
+      button {
+        max-width: 100%;
+        padding: 14px;
+        font-size: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="message" role="alert">
+    <h1>❌ Payment Failed</h1>
+    <p>Your transaction was cancelled or unsuccessful.</p>
+    <button onclick="retry()" aria-label="Try payment again">Try Again</button>
+  </div>
+
+  <script>
+    function retry() {
+      window.location.href = "/select-payment.html";
+    }
+  </script>
+</body>
+</html>
