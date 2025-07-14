@@ -1,0 +1,408 @@
+[
+  {
+    "timestamp": "2025-07-07T01:39:35.386Z",
+    "winningNumbers": [
+      23,
+      39,
+      19,
+      64,
+      62,
+      29
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 100,
+        "numbers": [
+          "11",
+          "22",
+          "33",
+          "45",
+          "32",
+          "12"
+        ],
+        "entryId": "id-1751852371987-81002"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T01:45:35.411Z",
+    "winningNumbers": [
+      29,
+      23,
+      38,
+      64,
+      56,
+      73
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 1000,
+        "numbers": [
+          "11",
+          "22",
+          "33",
+          "44",
+          "55",
+          "66"
+        ],
+        "entryId": "id-1751852727717-62282"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T02:13:35.502Z",
+    "winningNumbers": [
+      54,
+      12,
+      80,
+      67,
+      93,
+      63
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 1000,
+        "numbers": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "entryId": "id-1751854312732-51533"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T02:41:35.609Z",
+    "winningNumbers": [
+      72,
+      42,
+      68,
+      74,
+      64,
+      30
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 11,
+        "numbers": [
+          "11",
+          "22",
+          "45",
+          "27",
+          "24",
+          "13"
+        ],
+        "entryId": "id-1751855973921-965"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T03:33:35.788Z",
+    "winningNumbers": [
+      31,
+      16,
+      40,
+      92,
+      86,
+      52
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 100,
+        "numbers": [
+          "11",
+          "55",
+          "66",
+          "72",
+          "49",
+          "21"
+        ],
+        "entryId": "id-1751859209608-30656"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T03:55:35.899Z",
+    "winningNumbers": [
+      71,
+      78,
+      88,
+      86,
+      41,
+      65
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 100,
+        "numbers": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "entryId": "id-1751860446987-52152"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T05:59:36.410Z",
+    "winningNumbers": [
+      23,
+      54,
+      39,
+      81,
+      79,
+      42
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 12,
+        "numbers": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "entryId": "id-1751864345038-3269"
+      },
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 12,
+        "numbers": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "entryId": "id-1751864345038-3269"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T06:21:36.482Z",
+    "winningNumbers": [
+      8,
+      1,
+      47,
+      3,
+      5,
+      98
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 21,
+        "numbers": [
+          "12",
+          "23",
+          "45",
+          "34",
+          "32",
+          "12"
+        ],
+        "entryId": "id-1751869176618-48641"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T06:49:36.576Z",
+    "winningNumbers": [
+      28,
+      80,
+      37,
+      21,
+      74,
+      72
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 500,
+        "numbers": [
+          "12",
+          "34",
+          "55",
+          "66",
+          "77",
+          "88"
+        ],
+        "entryId": "id-1751870873134-94664"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T09:21:37.135Z",
+    "winningNumbers": [
+      92,
+      93,
+      9,
+      47,
+      59,
+      50
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 123,
+        "numbers": [
+          "11",
+          "22",
+          "33",
+          "44",
+          "44",
+          "55"
+        ],
+        "entryId": "id-1751880042404-66064"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T10:31:37.387Z",
+    "winningNumbers": [
+      18,
+      37,
+      71,
+      45,
+      69,
+      43
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "wwwwwwww@hmail.com",
+        "stake": 122,
+        "numbers": [
+          "11",
+          "22",
+          "33",
+          "44",
+          "55",
+          "66"
+        ],
+        "entryId": "id-1751884233135-87066"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-07T20:09:22.571Z",
+    "winningNumbers": [
+      42,
+      28,
+      93,
+      84,
+      70,
+      83
+    ],
+    "entries": [
+      {
+        "name": "david",
+        "email": "ajjsd@mail.com",
+        "stake": 500,
+        "numbers": [
+          "11",
+          "22",
+          "33",
+          "44",
+          "55",
+          "66"
+        ],
+        "entryId": "id-1751918912173-90099"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-08T23:56:15.882Z",
+    "winningNumbers": [
+      6,
+      79,
+      4,
+      86,
+      70,
+      49
+    ],
+    "entries": [
+      {
+        "name": "kiki",
+        "email": "hjgf@gmail.com",
+        "stake": 200,
+        "numbers": [
+          "11",
+          "22",
+          "33",
+          "44",
+          "55",
+          "66"
+        ],
+        "entryId": "id-1752018855153-81672"
+      }
+    ],
+    "winners": []
+  },
+  {
+    "timestamp": "2025-07-09T00:00:15.893Z",
+    "winningNumbers": [
+      31,
+      44,
+      87,
+      56,
+      98,
+      21
+    ],
+    "entries": [
+      {
+        "name": "wwwwwwwww",
+        "email": "hjgf@gmail.com",
+        "stake": 111,
+        "numbers": [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6"
+        ],
+        "entryId": "id-1752019145011-57733"
+      }
+    ],
+    "winners": []
+  }
+]
