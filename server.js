@@ -16,10 +16,22 @@ const upload = multer();
 const PORT = process.env.PORT || 4242;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://realovaraffle.vercel.app';
 
-// Log requests
-app.use((req, res, next) => {
-  console.log(`📡 ${req.method} ${req.url}`);
-  next();
+// --- CORS ---
+app.use(cors({
+  origin: FRONTEND_URL,       // Only allow your frontend
+  methods: ['GET','POST','PUT','DELETE','OPTIONS'],
+  credentials: true
+}));
+
+// Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
+
+// Email transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS }
 });
 
 // PayPal setup
@@ -31,27 +43,44 @@ const paypalClient = new paypal.core.PayPalHttpClient(
   new PayPalEnv(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET)
 );
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static('public'));
+// --- Example API endpoints for raffle ---
+app.post('/api/play', async (req, res) => {
+  try {
+    const { name, email, dob, stake, numbers, captcha } = req.body;
+    // TODO: verify captcha server-side if needed
+    if (!name || !email || !dob || !stake || !numbers) return res.status(400).json({ error: 'Missing fields' });
 
-// Email transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS }
+    // Save entry temporarily
+    const entries = fs.existsSync('entries.json') ? JSON.parse(fs.readFileSync('entries.json')) : [];
+    const entryId = Date.now().toString(); // simple unique ID
+    entries.push({ entryId, name, email, dob, stake, numbers });
+    fs.writeFileSync('entries.json', JSON.stringify(entries, null, 2));
+
+    // Send verification email here if needed
+    res.json({ success: true, entryId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
-// Helper: CAPTCHA condition
-function shouldTriggerCaptcha(email, ip) {
-  const entries = fs.existsSync('entries.json') ? JSON.parse(fs.readFileSync('entries.json')) : [];
-  return entries.filter(e => e.email === email || e.ip === ip).length >= 3;
-}
+app.post('/api/verify-code', async (req, res) => {
+  const { email, code } = req.body;
+  // TODO: verify the code
+  if (code === '123456') { // Example
+    res.json({ success: true });
+  } else {
+    res.json({ success: false, error: 'Invalid code' });
+  }
+});
 
-// --- API Routes ---
+app.post('/api/resend-code', async (req, res) => {
+  const { email } = req.body;
+  // TODO: resend code logic
+  res.json({ success: true });
+});
 
-// Create Stripe session
+// Stripe session
 app.post('/create-stripe-session', async (req, res) => {
   try {
     const { name, email, stake, numbers, dob } = req.body;
@@ -80,7 +109,7 @@ app.post('/create-stripe-session', async (req, res) => {
   }
 });
 
-// Create PayPal order
+// PayPal order
 app.post('/create-paypal-order', async (req, res) => {
   try {
     const { name, email, stake, numbers, dob } = req.body;
