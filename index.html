@@ -104,149 +104,10 @@
   </style>
 </head>
 <body>
- <script>
-  for (let i = 0; i < 80; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random() * 100 + 'vw';
-    star.style.animationDuration = (3 + Math.random() * 4) + 's';
-    star.style.animationDelay = Math.random() * 4 + 's';
-    document.body.appendChild(star);
-  }
-
-  let timerSeconds = 120;
-  function updateTimer() {
-    const minutes = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-    const seconds = String(timerSeconds % 60).padStart(2, '0');
-    document.getElementById('countdown').textContent = `Next draw in: ${minutes}:${seconds}`;
-    timerSeconds--;
-    if (timerSeconds < 0) timerSeconds = 120;
-  }
-  setInterval(updateTimer, 1000);
-
-  let resendCountdown = 60;
-  let resendInterval;
-
-  function getNumbers() {
-    return [1, 2, 3, 4, 5, 6].map(i => document.getElementById('num' + i).value.trim());
-  }
-
-  async function submitRaffle() {
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const dob = document.getElementById('dob').value.trim();
-    const stake = document.getElementById('stake').value.trim();
-    const numbers = getNumbers();
-    const code = document.getElementById('code').value.trim();
-    const captcha = grecaptcha.getResponse();
-
-    const isInVerification = sessionStorage.getItem('verificationStage') === 'true';
-
-    if (!name || !email || !stake || !dob || numbers.some(n => !n)) {
-      alert('Please fill in all fields and select 6 numbers.');
-      return;
-    }
-
-    if (!isInVerification && !captcha) {
-      alert('Please complete the CAPTCHA');
-      return;
-    }
-
-    if (!isInVerification) {
-      const res = await fetch('/api/play', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, dob, stake, numbers, captcha })
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        sessionStorage.setItem('entryId', data.entryId); // 🟢 Save entryId
-        sessionStorage.setItem('verificationStage', 'true');
-        alert('Verification code sent to your email.');
-        document.getElementById('code-section').style.display = 'block';
-        document.getElementById('resend-section').style.display = 'block';
-        startResendCountdown();
-      } else {
-        alert(data.error || 'Something went wrong.');
-      }
-    } else {
-      if (!code) {
-        alert('Please enter your verification code.');
-        return;
-      }
-
-      const verifyRes = await fetch('/api/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code })
-      });
-      const verifyData = await verifyRes.json();
-
-      if (verifyData.success) {
-        const entryId = sessionStorage.getItem('entryId'); // 🟢 Retrieve it
-        sessionStorage.removeItem('verificationStage');
-        sessionStorage.removeItem('entryId');
-        sessionStorage.setItem('raffleUser', JSON.stringify({
-          name, email, dob, stake, numbers, entryId
-        }));
-        window.location.href = 'select-payment.html';
-      } else {
-        alert(verifyData.error || 'Invalid code.');
-      }
-    }
-  }
-
-  function startResendCountdown() {
-    resendCountdown = 60;
-    document.getElementById('resend-btn').disabled = true;
-    document.getElementById('resend-timer').textContent = resendCountdown;
-    clearInterval(resendInterval);
-    resendInterval = setInterval(() => {
-      resendCountdown--;
-      document.getElementById('resend-timer').textContent = resendCountdown;
-      if (resendCountdown <= 0) {
-        clearInterval(resendInterval);
-        document.getElementById('resend-btn').disabled = false;
-      }
-    }, 1000);
-  }
-
-  async function resendCode() {
-    const email = document.getElementById('email').value.trim();
-    if (!email) return alert('Enter your email first.');
-
-    const res = await fetch('/api/resend-code', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const data = await res.json();
-
-    if (data.success) {
-      alert('New code sent.');
-      startResendCountdown();
-    } else {
-      alert(data.error || 'Failed to resend code.');
-    }
-  }
-
-  // Restore UI if already in verification stage
-  if (sessionStorage.getItem('verificationStage') === 'true') {
-    window.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('code-section').style.display = 'block';
-      document.getElementById('resend-section').style.display = 'block';
-    });
-  }
-</script>
-
-
   <div class="container">
-    
     <a href="introduction.html" style="color: inherit; text-decoration: none;">
-  <h2>REALOVA RAFFLE PICK 6</h2>
-</a>
-
+      <h2>REALOVA RAFFLE PICK 6</h2>
+    </a>
 
     <div class="form-group"><label for="dob">Date of Birth*</label><input type="date" id="dob" required></div>
     <div class="form-group"><label for="name">Your Name*</label><input type="text" id="name" required></div>
@@ -268,5 +129,133 @@
     <button class="play-btn" onclick="submitRaffle()">Play Now</button>
     <div id="countdown">Next draw in: 02:00</div>
   </div>
+
+  <script>
+    const BACKEND_URL = 'https://realovaraffle-2.onrender.com';
+
+    // Stars animation
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + 'vw';
+      star.style.animationDuration = (3 + Math.random() * 4) + 's';
+      star.style.animationDelay = Math.random() * 4 + 's';
+      document.body.appendChild(star);
+    }
+
+    // Countdown timer
+    let timerSeconds = 120;
+    function updateTimer() {
+      const minutes = String(Math.floor(timerSeconds / 60)).padStart(2,'0');
+      const seconds = String(timerSeconds % 60).padStart(2,'0');
+      document.getElementById('countdown').textContent = `Next draw in: ${minutes}:${seconds}`;
+      timerSeconds--;
+      if (timerSeconds < 0) timerSeconds = 120;
+    }
+    setInterval(updateTimer, 1000);
+
+    let resendCountdown = 60;
+    let resendInterval;
+
+    function startResendCountdown() {
+      resendCountdown = 60;
+      document.getElementById('resend-btn').disabled = true;
+      document.getElementById('resend-timer').textContent = resendCountdown;
+      clearInterval(resendInterval);
+      resendInterval = setInterval(() => {
+        resendCountdown--;
+        document.getElementById('resend-timer').textContent = resendCountdown;
+        if (resendCountdown <= 0) {
+          clearInterval(resendInterval);
+          document.getElementById('resend-btn').disabled = false;
+        }
+      }, 1000);
+    }
+
+    function getNumbers() {
+      return [1,2,3,4,5,6].map(i => document.getElementById('num'+i).value.trim());
+    }
+
+    async function submitRaffle() {
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const dob = document.getElementById('dob').value.trim();
+      const stake = document.getElementById('stake').value.trim();
+      const numbers = getNumbers();
+      const code = document.getElementById('code').value.trim();
+      const captcha = grecaptcha.getResponse();
+      const isInVerification = sessionStorage.getItem('verificationStage') === 'true';
+
+      if (!name || !email || !stake || !dob || numbers.some(n => !n)) {
+        alert('Please fill in all fields and select 6 numbers.');
+        return;
+      }
+
+      if (!isInVerification && !captcha) {
+        alert('Please complete the CAPTCHA');
+        return;
+      }
+
+      if (!isInVerification) {
+        const res = await fetch(`${BACKEND_URL}/api/play`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ name,email,dob,stake,numbers,captcha })
+        });
+        const data = await res.json();
+        if (data.success) {
+          sessionStorage.setItem('entryId', data.entryId);
+          sessionStorage.setItem('verificationStage','true');
+          alert('Verification code sent to your email.');
+          document.getElementById('code-section').style.display = 'block';
+          document.getElementById('resend-section').style.display = 'block';
+          startResendCountdown();
+        } else {
+          alert(data.error || 'Something went wrong.');
+        }
+      } else {
+        if (!code) { alert('Please enter your verification code.'); return; }
+        const verifyRes = await fetch(`${BACKEND_URL}/api/verify-code`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email, code })
+        });
+        const verifyData = await verifyRes.json();
+        if (verifyData.success) {
+          const entryId = sessionStorage.getItem('entryId');
+          sessionStorage.removeItem('verificationStage');
+          sessionStorage.removeItem('entryId');
+          sessionStorage.setItem('raffleUser', JSON.stringify({ name,email,dob,stake,numbers,entryId }));
+          window.location.href = 'select-payment.html';
+        } else {
+          alert(verifyData.error || 'Invalid code.');
+        }
+      }
+    }
+
+    async function resendCode() {
+      const email = document.getElementById('email').value.trim();
+      if (!email) return alert('Enter your email first.');
+      const res = await fetch(`${BACKEND_URL}/api/resend-code`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert('New code sent.');
+        startResendCountdown();
+      } else {
+        alert(data.error || 'Failed to resend code.');
+      }
+    }
+
+    if (sessionStorage.getItem('verificationStage') === 'true') {
+      window.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('code-section').style.display = 'block';
+        document.getElementById('resend-section').style.display = 'block';
+      });
+    }
+  </script>
 </body>
 </html>
