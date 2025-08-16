@@ -2,39 +2,35 @@ require('dotenv').config();
 
 const express = require('express');
 const fs = require('fs');
-const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const axios = require('axios');
 const nodemailer = require('nodemailer');
-const multer = require('multer');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const paypal = require('@paypal/checkout-server-sdk');
+const crypto = require('crypto');
 
 const app = express();
-const upload = multer();
 const PORT = process.env.PORT || 4242;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'https://realovaraffle.vercel.app';
 
 // --- CORS ---
 app.use(cors({
-  origin: FRONTEND_URL,       // Only allow your frontend
+  origin: FRONTEND_URL,
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
   credentials: true
 }));
 
-// Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Email transporter
+// --- Email setup ---
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS }
 });
 
-// PayPal setup
+// --- PayPal setup ---
 const PayPalEnv = process.env.PAYPAL_MODE === 'live'
   ? paypal.core.LiveEnvironment
   : paypal.core.SandboxEnvironment;
@@ -43,48 +39,96 @@ const paypalClient = new paypal.core.PayPalHttpClient(
   new PayPalEnv(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET)
 );
 
-// --- Example API endpoints for raffle ---
+// --- Helper files ---
+const entriesFile = 'entries.json';
+const codesFile = 'codes.json';
+
+// --- Helper functions ---
+function saveJSON(file, data) { fs.writeFileSync(file, JSON.stringify(data, null, 2)); }
+function readJSON(file) { return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file)) : {}; }
+
+// --- API endpoints ---
+
+// Play / submit raffle
 app.post('/api/play', async (req, res) => {
   try {
     const { name, email, dob, stake, numbers, captcha } = req.body;
-    // TODO: verify captcha server-side if needed
-    if (!name || !email || !dob || !stake || !numbers) return res.status(400).json({ error: 'Missing fields' });
+    if (!name || !email || !dob || !stake || !numbers) 
+      return res.status(400).json({ error: 'Missing fields' });
 
-    // Save entry temporarily
-    const entries = fs.existsSync('entries.json') ? JSON.parse(fs.readFileSync('entries.json')) : [];
-    const entryId = Date.now().toString(); // simple unique ID
-    entries.push({ entryId, name, email, dob, stake, numbers });
-    fs.writeFileSync('entries.json', JSON.stringify(entries, null, 2));
+    // Save entry
+    const entries = readJSON(entriesFile);
+    const entryId = Date.now().toString();
+    entries[entryId] = { entryId, name, email, dob, stake, numbers };
+    saveJSON(entriesFile, entries);
 
-    // Send verification email here if needed
+    // Generate 6-digit code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const codes = readJSON(codesFile);
+    codes[email] = code;
+    saveJSON(codesFile, codes);
+
+    // Send email
+    await transporter.sendMail({
+      from: `"Realova Raffle" <${process.env.MAIL_USER}>`,
+      to: email,
+      subject: 'Your Realova Raffle Verification Code',
+      text: `Hi ${name},\nYour verification code is: ${code}`,
+      html: `<p>Hi ${name},</p><p>Your verification code is: <strong>${code}</strong></p>`
+    });
+
+    console.log(`✅ Sent code ${code} to ${email}`);
+
     res.json({ success: true, entryId });
+
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Server error' });
+    console.error('❌ /api/play error:', err);
+    res.status(500).json({ error: 'Server error: could not send code' });
   }
 });
 
-app.post('/api/verify-code', async (req, res) => {
+// Verify code
+app.post('/api/verify-code', (req, res) => {
   const { email, code } = req.body;
-  // TODO: verify the code
-  if (code === '123456') { // Example
+  const codes = readJSON(codesFile);
+
+  if (codes[email] && codes[email] === code) {
+    delete codes[email];
+    saveJSON(codesFile, codes);
     res.json({ success: true });
   } else {
-    res.json({ success: false, error: 'Invalid code' });
+    res.json({ success: false, error: 'Invalid verification code' });
   }
 });
 
+// Resend code
 app.post('/api/resend-code', async (req, res) => {
   const { email } = req.body;
-  // TODO: resend code logic
-  res.json({ success: true });
+  const codes = readJSON(codesFile);
+
+  if (!codes[email]) return res.json({ success: false, error: 'No code found for this email' });
+
+  try {
+    await transporter.sendMail({
+      from: `"Realova Raffle" <${process.env.MAIL_USER}>`,
+      to: email,
+      subject: 'Your Realova Raffle Verification Code',
+      text: `Your verification code is: ${codes[email]}`,
+      html: `<p>Your verification code is: <strong>${codes[email]}</strong></p>`
+    });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('❌ /api/resend-code error:', err);
+    res.json({ success: false, error: 'Could not send code' });
+  }
 });
 
 // Stripe session
 app.post('/create-stripe-session', async (req, res) => {
   try {
     const { name, email, stake, numbers, dob } = req.body;
-    if (!name || !email || !stake || !numbers || !dob) return res.status(400).json({ error: 'Missing user data' });
+    if (!name || !email || !stake || !numbers || !dob) 
+      return res.status(400).json({ error: 'Missing user data' });
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -103,6 +147,7 @@ app.post('/create-stripe-session', async (req, res) => {
     });
 
     res.json({ url: session.url });
+
   } catch (err) {
     console.error("❌ Stripe session error:", err);
     res.status(500).json({ error: 'Stripe session creation failed' });
@@ -133,8 +178,8 @@ app.post('/create-paypal-order', async (req, res) => {
 
     const order = await paypalClient.execute(request);
     const approvalUrl = order.result.links.find(link => link.rel === 'approve')?.href;
-
     res.json({ url: approvalUrl });
+
   } catch (err) {
     console.error("❌ PayPal error:", err);
     res.status(500).json({ error: 'PayPal order creation failed' });
@@ -142,6 +187,4 @@ app.post('/create-paypal-order', async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🎯 Backend running → http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🎯 Backend running → http://localhost:${PORT}`));
