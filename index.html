@@ -162,7 +162,24 @@ function startResendCountdown() {
 }
 
 // Helper: get numbers
-function getNumbers() { return [1,2,3,4,5,6].map(i => document.getElementById('num'+i).value.trim()); }
+function getNumbers() { 
+  return [1,2,3,4,5,6].map(i => document.getElementById('num'+i).value.trim()); 
+}
+
+// Play Again button
+function playAgain() {
+  sessionStorage.removeItem('verificationStage');
+  sessionStorage.removeItem('entryId');
+  sessionStorage.removeItem('raffleUser');
+  document.getElementById('code-section').style.display = 'none';
+  document.getElementById('resend-section').style.display = 'none';
+  document.getElementById('name').value = '';
+  document.getElementById('email').value = '';
+  document.getElementById('dob').value = '';
+  document.getElementById('stake').value = '';
+  [1,2,3,4,5,6].forEach(i => document.getElementById('num'+i).value = '');
+  grecaptcha.reset();
+}
 
 // Submit raffle / verification
 async function submitRaffle() {
@@ -175,44 +192,75 @@ async function submitRaffle() {
   const captcha = grecaptcha.getResponse();
   const isInVerification = sessionStorage.getItem('verificationStage') === 'true';
 
-  if (!name || !email || !stake || !dob || numbers.some(n=>!n)) { alert('Please fill in all fields and select 6 numbers.'); return; }
+  if (!name || !email || !stake || !dob || numbers.some(n=>!n)) { 
+    alert('Please fill in all fields and select 6 numbers.'); 
+    return; 
+  }
 
-  if (!isInVerification && !captcha) { alert('Please complete the CAPTCHA'); return; }
+  if (!isInVerification && !captcha) { 
+    alert('Please complete the CAPTCHA'); 
+    return; 
+  }
 
-  if (!isInVerification) {
-    // First submission: request code
-    const res = await fetch(`${BACKEND_URL}/api/play`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ name,email,dob,stake,numbers,captcha })
-    });
-    const data = await res.json();
-    if (data.success) {
-      sessionStorage.setItem('entryId', data.entryId);
-      sessionStorage.setItem('verificationStage','true');
-      sessionStorage.setItem('raffleUser', JSON.stringify({ name,email,dob,stake,numbers }));
-      alert('Verification code sent to your email.');
-      document.getElementById('code-section').style.display = 'block';
-      document.getElementById('resend-section').style.display = 'block';
-      startResendCountdown();
-    } else { alert(data.error || 'Something went wrong.'); }
-  } else {
-    // Verify code
-    if (!code) { alert('Please enter your verification code.'); return; }
-    const verifyRes = await fetch(`${BACKEND_URL}/api/verify-code`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ email, code })
-    });
-    const verifyData = await verifyRes.json();
-    if (verifyData.success) {
-      const raffleUser = JSON.parse(sessionStorage.getItem('raffleUser') || '{}');
-      raffleUser.entryId = sessionStorage.getItem('entryId');
-      sessionStorage.removeItem('verificationStage');
-      sessionStorage.removeItem('entryId');
-      sessionStorage.setItem('raffleUser', JSON.stringify(raffleUser));
-      window.location.href = 'select-payment.html';
-    } else { alert(verifyData.error || 'Invalid code.'); }
+  try {
+    if (!isInVerification) {
+      const res = await fetch(`${BACKEND_URL}/api/play`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ name,email,dob,stake,numbers,captcha })
+      });
+
+      let data;
+      try { data = await res.json(); }
+      catch(e) {
+        console.error('Server returned non-JSON:', await res.text());
+        alert('Server error: Could not parse response.');
+        return;
+      }
+
+      if (data.success) {
+        sessionStorage.setItem('entryId', data.entryId);
+        sessionStorage.setItem('verificationStage','true');
+        sessionStorage.setItem('raffleUser', JSON.stringify({ name,email,dob,stake,numbers }));
+        alert('Verification code sent to your email.');
+        document.getElementById('code-section').style.display='block';
+        document.getElementById('resend-section').style.display='block';
+        startResendCountdown();
+      } else {
+        alert(data.error || 'Something went wrong.');
+      }
+
+    } else {
+      if (!code) { alert('Please enter verification code'); return; }
+
+      const verifyRes = await fetch(`${BACKEND_URL}/api/verify-code`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ email, code })
+      });
+
+      let verifyData;
+      try { verifyData = await verifyRes.json(); }
+      catch(e) {
+        console.error('Server returned non-JSON:', await verifyRes.text());
+        alert('Server error: Could not parse response.');
+        return;
+      }
+
+      if (verifyData.success) {
+        const raffleUser = JSON.parse(sessionStorage.getItem('raffleUser')||'{}');
+        raffleUser.entryId = sessionStorage.getItem('entryId');
+        sessionStorage.removeItem('verificationStage');
+        sessionStorage.removeItem('entryId');
+        sessionStorage.setItem('raffleUser', JSON.stringify(raffleUser));
+        window.location.href = 'select-payment.html';
+      } else {
+        alert(verifyData.error || 'Invalid code.');
+      }
+    }
+  } catch(err) {
+    console.error('Network error:', err);
+    alert('Could not reach backend. Check URL or internet.');
   }
 }
 
@@ -220,28 +268,31 @@ async function submitRaffle() {
 async function resendCode() {
   const email = document.getElementById('email').value.trim();
   if (!email) return alert('Enter your email first.');
-  const res = await fetch(`${BACKEND_URL}/api/resend-code`, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ email })
-  });
-  const data = await res.json();
-  if (data.success) { alert('New code sent.'); startResendCountdown(); }
-  else { alert(data.error || 'Failed to resend code.'); }
-}
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/resend-code`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email })
+    });
 
-// Play Again button
-function playAgain() {
-  sessionStorage.removeItem('verificationStage');
-  sessionStorage.removeItem('entryId');
-  document.getElementById('code-section').style.display = 'none';
-  document.getElementById('resend-section').style.display = 'none';
-  document.getElementById('name').value = '';
-  document.getElementById('email').value = '';
-  document.getElementById('dob').value = '';
-  document.getElementById('stake').value = '';
-  [1,2,3,4,5,6].forEach(i => document.getElementById('num'+i).value = '');
-  grecaptcha.reset();
+    let data;
+    try { data = await res.json(); }
+    catch(e) {
+      console.error('Server returned non-JSON:', await res.text());
+      alert('Server error: Could not parse response.');
+      return;
+    }
+
+    if (data.success) { 
+      alert('New code sent.'); 
+      startResendCountdown(); 
+    } else { 
+      alert(data.error || 'Failed to resend code.'); 
+    }
+  } catch(err) {
+    console.error('Network error:', err);
+    alert('Could not reach backend. Check URL or internet.');
+  }
 }
 
 // Restore verification state if page reloads
