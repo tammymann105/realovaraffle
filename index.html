@@ -1,261 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Realova Raffle – Pick 6</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-  <style>
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
-    input[type=number] { -moz-appearance:textfield; appearance:textfield; }
-    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-    html, body { height:100%; overflow:hidden; }
-    body {
-      font-family:'Outfit',sans-serif;
-      background:#020014;
-      color:#fff;
-      display:flex; justify-content:center; align-items:center;
-      padding:10px;
-      perspective:800px;
-    }
-    .star {
-      position:absolute; top:-5px;
-      width:3px; height:3px; background:#0ff; border-radius:50%; opacity:0.8;
-      animation:fall 6s linear infinite;
-      box-shadow:0 0 6px #0ff,0 0 12px rgba(0,255,255,0.7);
-    }
-    @keyframes fall { to { transform:translateY(110vh); opacity:0; } }
-    .container {
-      background:rgba(20,20,40,0.9);
-      backdrop-filter:blur(4px);
-      padding:12px;
-      border-radius:20px;
-      box-shadow:inset 2px 2px 8px rgba(0,0,0,0.7), inset -2px -2px 8px rgba(255,255,255,0.1), 0 10px 30px rgba(0,0,0,0.8), 0 0 16px #0ff, 0 0 32px rgba(0,255,255,0.5);
-      width:100%; max-width:300px;
-      text-align:center;
-      z-index: 1;
-    }
-    h2 {
-      font-family:'Orbitron',sans-serif;
-      font-weight:600;
-      font-size:1.5rem;
-      background:linear-gradient(45deg,#0ff,#00ffcc);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      text-shadow:1px 1px 3px rgba(255,255,255,0.6);
-      margin-bottom:12px;
-    }
-    .form-group { margin-bottom:12px; text-align:left; }
-    .form-group label {
-      display:block;
-      margin-bottom:4px;
-      color:#0ff;
-      font-size:13px;
-    }
-    .form-group input, #code-section input {
-      width:100%; padding:10px;
-      background:transparent;
-      border:2px solid #0ff;
-      border-radius:12px;
-      font-size:14px; color:#fff;
-      box-shadow:0 4px 8px rgba(0,0,0,0.6),0 0 8px #0ff;
-    }
-    .number-grid {
-      display:flex; flex-wrap:wrap; justify-content:space-between; margin:12px 0;
-    }
-    .number-grid input {
-      width:34px; height:34px; margin:4px;
-      background:linear-gradient(145deg,rgba(255,255,255,0.1),rgba(0,0,0,0.4));
-      border:2px solid #0ff; border-radius:50%; text-align:center;
-      font-size:14px; color:#fff;
-      box-shadow:2px 2px 4px rgba(0,0,0,0.8),0 0 8px #0ff;
-    }
-    #captcha-wrapper {
-      margin: 12px 0;
-      display: flex;
-      justify-content: center;
-    }
-    #code-section, #resend-section {
-      display: none;
-      margin-top: 12px;
-    }
-    .play-btn {
-      width:100%; padding:10px;
-      font-family:'Orbitron',sans-serif;
-      font-size:15px;
-      font-weight:600;
-      background:transparent;
-      border:2px solid #0ff;
-      border-radius:14px;
-      color:#0ff;
-      box-shadow:0 6px 12px rgba(0,0,0,0.8),0 0 12px #0ff;
-      margin-bottom:6px;
-      cursor:pointer;
-    }
-    #resend-btn:disabled {
-      opacity: 0.5;
-    }
-    #countdown {
-      margin-top:8px; color:#ff66cc;
-      font-family:monospace; font-size:14px; font-weight:600;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Realova Raffle – Pick 6</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<style>
+/* Reset & Styles */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+input[type=number] { -moz-appearance:textfield; appearance:textfield; }
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family:'Outfit',sans-serif;
+  background:#020014;
+  color:#fff;
+  display:flex; justify-content:center; align-items:center;
+  padding:10px;
+  perspective:800px;
+}
+.star {
+  position:absolute; top:-5px;
+  width:3px; height:3px; background:#0ff; border-radius:50%; opacity:0.8;
+  animation:fall 6s linear infinite;
+  box-shadow:0 0 6px #0ff,0 0 12px rgba(0,255,255,0.7);
+}
+@keyframes fall { to { transform:translateY(110vh); opacity:0; } }
+.container {
+  background:rgba(20,20,40,0.9);
+  backdrop-filter:blur(4px);
+  padding:12px;
+  border-radius:20px;
+  box-shadow:inset 2px 2px 8px rgba(0,0,0,0.7), inset -2px -2px 8px rgba(255,255,255,0.1), 0 10px 30px rgba(0,0,0,0.8), 0 0 16px #0ff, 0 0 32px rgba(0,255,255,0.5);
+  width:100%; max-width:300px;
+  text-align:center;
+  z-index: 1;
+}
+h2 {
+  font-family:'Orbitron',sans-serif;
+  font-weight:600;
+  font-size:1.5rem;
+  background:linear-gradient(45deg,#0ff,#00ffcc);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  text-shadow:1px 1px 3px rgba(255,255,255,0.6);
+  margin-bottom:12px;
+}
+.form-group { margin-bottom:12px; text-align:left; }
+.form-group label {
+  display:block;
+  margin-bottom:4px;
+  color:#0ff;
+  font-size:13px;
+}
+.form-group input, #code-section input {
+  width:100%; padding:10px;
+  background:transparent;
+  border:2px solid #0ff;
+  border-radius:12px;
+  font-size:14px; color:#fff;
+  box-shadow:0 4px 8px rgba(0,0,0,0.6),0 0 8px #0ff;
+}
+.number-grid {
+  display:flex; flex-wrap:wrap; justify-content:space-between; margin:12px 0;
+}
+.number-grid input {
+  width:34px; height:34px; margin:4px;
+  background:linear-gradient(145deg,rgba(255,255,255,0.1),rgba(0,0,0,0.4));
+  border:2px solid #0ff; border-radius:50%; text-align:center;
+  font-size:14px; color:#fff;
+  box-shadow:2px 2px 4px rgba(0,0,0,0.8),0 0 8px #0ff;
+}
+#captcha-wrapper { margin:12px 0; display:flex; justify-content:center; }
+#code-section, #resend-section { display:none; margin-top:12px; }
+.play-btn {
+  width:100%; padding:10px;
+  font-family:'Orbitron',sans-serif;
+  font-size:15px;
+  font-weight:600;
+  background:transparent;
+  border:2px solid #0ff;
+  border-radius:14px;
+  color:#0ff;
+  box-shadow:0 6px 12px rgba(0,0,0,0.8),0 0 12px #0ff;
+  margin-bottom:6px;
+  cursor:pointer;
+}
+#resend-btn:disabled { opacity: 0.5; }
+#countdown { margin-top:8px; color:#ff66cc; font-family:monospace; font-size:14px; font-weight:600; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <a href="introduction.html" style="color: inherit; text-decoration: none;">
-      <h2>REALOVA RAFFLE PICK 6</h2>
-    </a>
+<div class="container">
+  <a href="introduction.html" style="color: inherit; text-decoration: none;">
+    <h2>REALOVA RAFFLE PICK 6</h2>
+  </a>
 
-    <div class="form-group"><label for="dob">Date of Birth*</label><input type="date" id="dob" required></div>
-    <div class="form-group"><label for="name">Your Name*</label><input type="text" id="name" required></div>
-    <div class="form-group"><label for="email">Your Email*</label><input type="email" id="email" required></div>
-    <div class="form-group"><label for="stake">Your Stake (€)*</label><input type="number" id="stake" min="1" max="500" required></div>
-    <div class="number-grid">
-      <input type="number" id="num1" min="1" max="100" required>
-      <input type="number" id="num2" min="1" max="100" required>
-      <input type="number" id="num3" min="1" max="100" required>
-      <input type="number" id="num4" min="1" max="100" required>
-      <input type="number" id="num5" min="1" max="100" required>
-      <input type="number" id="num6" min="1" max="100" required>
-    </div>
-    <div id="captcha-wrapper"><div class="g-recaptcha" data-sitekey="6LfWNqgrAAAAAG6svJF5Fcj9vPGqdFZDAKYgBQUz"></div></div>
-    <div id="code-section"><input type="text" id="code" placeholder="Enter verification code"></div>
-    <div id="resend-section">
-      <button class="play-btn" id="resend-btn" onclick="resendCode()" disabled>Resend Code (<span id="resend-timer">60</span>s)</button>
-    </div>
-    <button class="play-btn" onclick="submitRaffle()">Play Now</button>
-    <div id="countdown">Next draw in: 02:00</div>
+  <div class="form-group"><label for="dob">Date of Birth*</label><input type="date" id="dob" required></div>
+  <div class="form-group"><label for="name">Your Name*</label><input type="text" id="name" required></div>
+  <div class="form-group"><label for="email">Your Email*</label><input type="email" id="email" required></div>
+  <div class="form-group"><label for="stake">Your Stake (€)*</label><input type="number" id="stake" min="1" max="500" required></div>
+  <div class="number-grid">
+    <input type="number" id="num1" min="1" max="100" required>
+    <input type="number" id="num2" min="1" max="100" required>
+    <input type="number" id="num3" min="1" max="100" required>
+    <input type="number" id="num4" min="1" max="100" required>
+    <input type="number" id="num5" min="1" max="100" required>
+    <input type="number" id="num6" min="1" max="100" required>
   </div>
+  <div id="captcha-wrapper"><div class="g-recaptcha" data-sitekey="6LfWNqgrAAAAAG6svJF5Fcj9vPGqdFZDAKYgBQUz"></div></div>
+  <div id="code-section"><input type="text" id="code" placeholder="Enter verification code"></div>
+  <div id="resend-section">
+    <button class="play-btn" id="resend-btn" onclick="resendCode()" disabled>Resend Code (<span id="resend-timer">60</span>s)</button>
+  </div>
+  <button class="play-btn" onclick="submitRaffle()">Play Now</button>
+  <div id="countdown">Next draw in: 02:00</div>
+</div>
 
-  <script>
-    const BACKEND_URL = 'https://realovaraffle-2.onrender.com';
+<script>
+const BACKEND_URL = 'https://realovaraffle-2.onrender.com';
 
-    // Stars animation
-    for (let i = 0; i < 80; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = Math.random() * 100 + 'vw';
-      star.style.animationDuration = (3 + Math.random() * 4) + 's';
-      star.style.animationDelay = Math.random() * 4 + 's';
-      document.body.appendChild(star);
-    }
+// Stars animation
+for (let i = 0; i < 80; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  star.style.left = Math.random() * 100 + 'vw';
+  star.style.animationDuration = (3 + Math.random() * 4) + 's';
+  star.style.animationDelay = Math.random() * 4 + 's';
+  document.body.appendChild(star);
+}
 
-    // Countdown timer
-    let timerSeconds = 120;
-    function updateTimer() {
-      const minutes = String(Math.floor(timerSeconds / 60)).padStart(2,'0');
-      const seconds = String(timerSeconds % 60).padStart(2,'0');
-      document.getElementById('countdown').textContent = `Next draw in: ${minutes}:${seconds}`;
-      timerSeconds--;
-      if (timerSeconds < 0) timerSeconds = 120;
-    }
-    setInterval(updateTimer, 1000);
+// Countdown timer
+let timerSeconds = 120;
+function updateTimer() {
+  const minutes = String(Math.floor(timerSeconds / 60)).padStart(2,'0');
+  const seconds = String(timerSeconds % 60).padStart(2,'0');
+  document.getElementById('countdown').textContent = `Next draw in: ${minutes}:${seconds}`;
+  timerSeconds--;
+  if (timerSeconds < 0) timerSeconds = 120;
+}
+setInterval(updateTimer, 1000);
 
-    let resendCountdown = 60;
-    let resendInterval;
-
-    function startResendCountdown() {
-      resendCountdown = 60;
-      document.getElementById('resend-btn').disabled = true;
-      document.getElementById('resend-timer').textContent = resendCountdown;
+// Resend code countdown
+let resendCountdown = 60;
+let resendInterval;
+function startResendCountdown() {
+  resendCountdown = 60;
+  document.getElementById('resend-btn').disabled = true;
+  document.getElementById('resend-timer').textContent = resendCountdown;
+  clearInterval(resendInterval);
+  resendInterval = setInterval(() => {
+    resendCountdown--;
+    document.getElementById('resend-timer').textContent = resendCountdown;
+    if (resendCountdown <= 0) {
       clearInterval(resendInterval);
-      resendInterval = setInterval(() => {
-        resendCountdown--;
-        document.getElementById('resend-timer').textContent = resendCountdown;
-        if (resendCountdown <= 0) {
-          clearInterval(resendInterval);
-          document.getElementById('resend-btn').disabled = false;
-        }
-      }, 1000);
+      document.getElementById('resend-btn').disabled = false;
     }
+  }, 1000);
+}
 
-    function getNumbers() {
-      return [1,2,3,4,5,6].map(i => document.getElementById('num'+i).value.trim());
-    }
+// Helper: get numbers
+function getNumbers() { return [1,2,3,4,5,6].map(i => document.getElementById('num'+i).value.trim()); }
 
-    async function submitRaffle() {
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const dob = document.getElementById('dob').value.trim();
-      const stake = document.getElementById('stake').value.trim();
-      const numbers = getNumbers();
-      const code = document.getElementById('code').value.trim();
-      const captcha = grecaptcha.getResponse();
-      const isInVerification = sessionStorage.getItem('verificationStage') === 'true';
+// Submit raffle / verification
+async function submitRaffle() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const dob = document.getElementById('dob').value.trim();
+  const stake = document.getElementById('stake').value.trim();
+  const numbers = getNumbers();
+  const code = document.getElementById('code').value.trim();
+  const captcha = grecaptcha.getResponse();
+  const isInVerification = sessionStorage.getItem('verificationStage') === 'true';
 
-      if (!name || !email || !stake || !dob || numbers.some(n => !n)) {
-        alert('Please fill in all fields and select 6 numbers.');
-        return;
-      }
+  if (!name || !email || !stake || !dob || numbers.some(n=>!n)) { alert('Please fill in all fields and select 6 numbers.'); return; }
 
-      if (!isInVerification && !captcha) {
-        alert('Please complete the CAPTCHA');
-        return;
-      }
+  if (!isInVerification && !captcha) { alert('Please complete the CAPTCHA'); return; }
 
-      if (!isInVerification) {
-        const res = await fetch(`${BACKEND_URL}/api/play`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ name,email,dob,stake,numbers,captcha })
-        });
-        const data = await res.json();
-        if (data.success) {
-          sessionStorage.setItem('entryId', data.entryId);
-          sessionStorage.setItem('verificationStage','true');
-          alert('Verification code sent to your email.');
-          document.getElementById('code-section').style.display = 'block';
-          document.getElementById('resend-section').style.display = 'block';
-          startResendCountdown();
-        } else {
-          alert(data.error || 'Something went wrong.');
-        }
-      } else {
-        if (!code) { alert('Please enter your verification code.'); return; }
-        const verifyRes = await fetch(`${BACKEND_URL}/api/verify-code`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email, code })
-        });
-        const verifyData = await verifyRes.json();
-        if (verifyData.success) {
-          const entryId = sessionStorage.getItem('entryId');
-          sessionStorage.removeItem('verificationStage');
-          sessionStorage.removeItem('entryId');
-          sessionStorage.setItem('raffleUser', JSON.stringify({ name,email,dob,stake,numbers,entryId }));
-          window.location.href = 'select-payment.html';
-        } else {
-          alert(verifyData.error || 'Invalid code.');
-        }
-      }
-    }
+  if (!isInVerification) {
+    // First submission: request code
+    const res = await fetch(`${BACKEND_URL}/api/play`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name,email,dob,stake,numbers,captcha })
+    });
+    const data = await res.json();
+    if (data.success) {
+      sessionStorage.setItem('entryId', data.entryId);
+      sessionStorage.setItem('verificationStage','true');
+      sessionStorage.setItem('raffleUser', JSON.stringify({ name,email,dob,stake,numbers }));
+      alert('Verification code sent to your email.');
+      document.getElementById('code-section').style.display = 'block';
+      document.getElementById('resend-section').style.display = 'block';
+      startResendCountdown();
+    } else { alert(data.error || 'Something went wrong.'); }
+  } else {
+    // Verify code
+    if (!code) { alert('Please enter your verification code.'); return; }
+    const verifyRes = await fetch(`${BACKEND_URL}/api/verify-code`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email, code })
+    });
+    const verifyData = await verifyRes.json();
+    if (verifyData.success) {
+      const raffleUser = JSON.parse(sessionStorage.getItem('raffleUser') || '{}');
+      raffleUser.entryId = sessionStorage.getItem('entryId');
+      sessionStorage.removeItem('verificationStage');
+      sessionStorage.removeItem('entryId');
+      sessionStorage.setItem('raffleUser', JSON.stringify(raffleUser));
+      window.location.href = 'select-payment.html';
+    } else { alert(verifyData.error || 'Invalid code.'); }
+  }
+}
 
-    async function resendCode() {
-      const email = document.getElementById('email').value.trim();
-      if (!email) return alert('Enter your email first.');
-      const res = await fetch(`${BACKEND_URL}/api/resend-code`, {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ email })
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('New code sent.');
-        startResendCountdown();
-      } else {
-        alert(data.error || 'Failed to resend code.');
-      }
-    }
+// Resend verification code
+async function resendCode() {
+  const email = document.getElementById('email').value.trim();
+  if (!email) return alert('Enter your email first.');
+  const res = await fetch(`${BACKEND_URL}/api/resend-code`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ email })
+  });
+  const data = await res.json();
+  if (data.success) { alert('New code sent.'); startResendCountdown(); }
+  else { alert(data.error || 'Failed to resend code.'); }
+}
 
-    if (sessionStorage.getItem('verificationStage') === 'true') {
-      window.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('code-section').style.display = 'block';
-        document.getElementById('resend-section').style.display = 'block';
-      });
-    }
-  </script>
+// Play Again button
+function playAgain() {
+  sessionStorage.removeItem('verificationStage');
+  sessionStorage.removeItem('entryId');
+  document.getElementById('code-section').style.display = 'none';
+  document.getElementById('resend-section').style.display = 'none';
+  document.getElementById('name').value = '';
+  document.getElementById('email').value = '';
+  document.getElementById('dob').value = '';
+  document.getElementById('stake').value = '';
+  [1,2,3,4,5,6].forEach(i => document.getElementById('num'+i).value = '');
+  grecaptcha.reset();
+}
+
+// Restore verification state if page reloads
+if (sessionStorage.getItem('verificationStage') === 'true') {
+  document.getElementById('code-section').style.display = 'block';
+  document.getElementById('resend-section').style.display = 'block';
+}
+</script>
 </body>
 </html>
