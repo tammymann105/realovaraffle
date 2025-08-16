@@ -138,47 +138,39 @@
  <script>
   const data = JSON.parse(sessionStorage.getItem('raffleUser'));
   console.log("📦 raffleUser from sessionStorage:", data);
+async function pay(method) {
+  if (!data) {
+    alert("Missing user data. Please go back and complete the form.");
+    return;
+  }
 
-  async function pay(method) {
-    if (!data) {
-      alert("Missing user data. Please go back and complete the form.");
+  const backend = "https://realovaraffle-2.onrender.com";
+  const endpoint = method === 'stripe' 
+    ? `${backend}/create-stripe-session` 
+    : `${backend}/create-paypal-order`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (!response.ok) {
+      const err = await response.text();
+      console.error("❌ Server returned error:", err);
+      alert("Payment failed: " + err);
       return;
     }
 
-    const endpoint = method === 'stripe' 
-      ? '/create-stripe-session' 
-      : '/create-paypal-order';
-
-    console.log(`➡️ Sending request to ${endpoint} with:`, data);
-
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      if (!response.ok) {
-        const err = await response.text();
-        console.error("❌ Server returned error:", err);
-        alert("Payment failed: " + err);
-        return;
-      }
-
-      const result = await response.json();
-      console.log("✅ Server response:", result);
-
-      if (result.url) {
-        console.log("🌐 Redirecting to:", result.url);
-        window.location.href = result.url;
-      } else {
-        alert("Payment error: " + (result.error || 'Unknown error'));
-      }
-    } catch (err) {
-      console.error("🔥 Network or fetch error:", err);
-      alert("Could not reach the payment server: " + err.message);
-    }
+    const result = await response.json();
+    if (result.url) window.location.href = result.url;
+    else alert("Payment error: " + (result.error || 'Unknown error'));
+  } catch (err) {
+    console.error("🔥 Network or fetch error:", err);
+    alert("Could not reach the payment server: " + err.message);
   }
+}
 </script>
 
 </body>
